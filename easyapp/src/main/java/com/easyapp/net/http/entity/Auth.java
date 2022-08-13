@@ -33,7 +33,7 @@ public abstract class Auth {
 
         private static String encode(String username, String password){
             //Flag NO_WRAP evita quebra de linha, ilegal no header
-            return SimpleBase64.encodeToString((username+":"+password).getBytes(), SimpleBase64.NO_WRAP);
+            return SimpleBase64.encodeToString((username+":"+password), SimpleBase64.NO_WRAP);
         }
     }
 
