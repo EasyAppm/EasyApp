@@ -8,7 +8,6 @@ android {
     buildToolsVersion "21.1.0"
 
     defaultConfig {
-        applicationId "com.easyapp"
         minSdkVersion 14
         targetSdkVersion 21
         versionCode 1
@@ -32,8 +31,8 @@ afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-                groupId = 'com.github.carlos1327'
-                artifactId = 'easyapp'
+                groupId = 'com.github.easyappm'
+                artifactId = 'Easyapp'
                 version = '1.0'
             }
         }
