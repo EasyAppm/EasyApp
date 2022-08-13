@@ -121,7 +121,7 @@ public class FileCipher extends AESCipher{
         if(inputStream == null) {
             return new ResultCipher(new IllegalArgumentException("inputStream cannot be null"));
         }
-        final ResultCipher result;
+        ResultCipher result;
         CipherInputStream cis = null;
         try{
             final Cipher CIPHER = new FileCipher(key).newCipherDecryptMode();
