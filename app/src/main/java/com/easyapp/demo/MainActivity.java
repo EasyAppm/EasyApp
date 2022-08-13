@@ -95,7 +95,7 @@ public class MainActivity extends Activity{
     }
 
     private void toast(String message){
-        Toast.makeText(MainActivity.this, message, 0).show();
+        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.easyapp.net.http;
 
+import com.easyapp.core.TypeValidator;
 import com.easyapp.net.http.callback.CallbackStream;
 import com.easyapp.net.http.entity.Body;
 import com.easyapp.net.http.entity.Header;
@@ -7,6 +8,7 @@ import com.easyapp.net.http.entity.Request;
 import com.easyapp.net.http.entity.Response;
 import com.easyapp.net.http.entity.Status;
 import com.easyapp.task.SimpleTask;
+import com.easyapp.util.StreamUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -21,8 +23,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import com.easyapp.core.TypeValidator;
-import com.easyapp.util.StreamUtils;
 
 public class AsyncConnection{
 
