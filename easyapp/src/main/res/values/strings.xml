@@ -2,6 +2,7 @@
 <resources>
 
     <string name="lib_name">easyapp</string>
+    <string name="tag_render">easyapp_render_content</string>
     <string name="hello_world">Hello world!</string>
 
 </resources>

@@ -1,5 +1,4 @@
 package com.easyapp.core;
-import java.util.Objects;
 
 public class TypeInstance{
 
