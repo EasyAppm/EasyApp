@@ -49,7 +49,9 @@ public final class Client extends URLHandler{
 
     public AsyncConnection get(Header header){
         return createAsyncConnection(
-            Request.get(getUrl()).build()
+            Request.get(getUrl())
+            .setHeader(header)
+            .build()
         );
     }
 
@@ -63,7 +65,10 @@ public final class Client extends URLHandler{
 
     public AsyncConnection head(Header header){
         return createAsyncConnection(
-            Request.head(getUrl()).build()
+            Request.head(getUrl())
+            .setHeader(header)
+            .build()
+            
         );
     }
 

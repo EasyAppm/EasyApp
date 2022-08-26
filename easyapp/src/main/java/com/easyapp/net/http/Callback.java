@@ -1,8 +1,8 @@
-package com.easyapp.net.http.callback;
+package com.easyapp.net.http;
 
 import com.easyapp.net.http.entity.Response;
 
-public interface CallbackStream{
+public interface Callback{
     void onResponse(Response response);
     void onFailure(Throwable throwable);
 }

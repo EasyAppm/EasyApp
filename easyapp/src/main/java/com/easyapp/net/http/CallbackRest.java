@@ -1,23 +1,23 @@
-package com.easyapp.net.http.callback;
+package com.easyapp.net.http;
 
 import com.easyapp.net.http.entity.Body;
 import com.easyapp.net.http.entity.Header;
 import com.easyapp.net.http.entity.Response;
 import com.easyapp.net.http.entity.Status;
 
-public abstract class CallbackRest implements CallbackStream{
+public abstract class CallbackRest implements Callback{
     @Override
     public final void onResponse(final Response response){
         if(response.containsBody()){
-            Body body = response.getBody();
-            body.convertString(new Body.ConvertCallback<String>(response){
+            response.getBody()
+                .readString(new Body.Callback<String>(response){
                     @Override
-                    public void onFinishConvert(String parse){
-                        onResponse(parse, response.getStatus(), response.getHeader());
+                    protected void onReadSuccess(String result){
+                        onResponse(result, response.getStatus(), response.getHeader());
                     }
 
                     @Override
-                    public void onFailureConvert(Throwable throwable){
+                    protected void onReadFailure(Throwable throwable){
                         onFailure(throwable);
                     }
                 });

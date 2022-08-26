@@ -1,6 +1,8 @@
 package com.easyapp.net.http.entity;
 
 import com.easyapp.net.http.Method;
+import com.easyapp.net.http.Property;
+import java.io.IOException;
 
 public class Request{
 
@@ -80,7 +82,7 @@ public class Request{
         private Body body;
         private Header header;
         private Method method;
-        
+
         public Builder(Request request){
             this.url = request.url;
             this.method = request.method;
@@ -88,7 +90,7 @@ public class Request{
             this.header = request.header;
             this.body = request.body;
         }
-        
+
         public Builder(String method, String url){
             this(Method.valueOf(method), url);
         }
@@ -116,10 +118,31 @@ public class Request{
         }
 
         public Request build(){
-            if(method.isRequiredBody() && body == null){
-                throw new IllegalArgumentException(String.format("The %s method cannot be built without a Body", method.name()));
+            if(method.isRequiredBody()){
+                if(body == null){
+                    throw new IllegalArgumentException(String.format("The %s method cannot be built without a Body", method.name()));
+                }else if(header != null){
+                    try{
+                        addDefaultHeaders();
+                    }catch(IOException e){
+                        e.printStackTrace();
+                    }
+                }
             }
             return new Request(this);
+        }
+
+        private void addDefaultHeaders() throws IOException{
+            if(!header.containsKey(Property.CONTENT_TYPE.name())){
+                header = new Header.Builder(header)
+                    .putContentType("application/json")
+                    .build();
+            }
+            if(!header.containsKey(Property.CONTENT_LENGTH.name())){
+                header = new Header.Builder(header)
+                    .putContentLength(String.valueOf(body.stream().available()))
+                    .build();
+            }
         }
     }
 

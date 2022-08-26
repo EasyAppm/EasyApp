@@ -3,6 +3,8 @@ package com.easyapp.net.http.entity;
 import com.easyapp.net.http.Property;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONObject;
+import org.json.JSONException;
 
 public class Header{
 
@@ -41,8 +43,35 @@ public class Header{
     }
 
     public String[] getKeys(){
-        return (headers == null) ? new String[0] : 
-            headers.keySet().toArray(new String[headers.size()]);
+        return (headers == null) ? new String[0] : headers.keySet().toArray(new String[0]);
+    }
+
+    public void clear(){
+        headers.clear();
+    }
+
+    public String remove(String key){
+        return headers.remove(key);
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        for(String key : headers.keySet()){
+            sb.append(key)
+                .append(": ")
+                .append(headers.get(key))
+                .append("\n");
+        }
+        return sb.toString();
+    }
+
+    public String toJson(int indentSpaces) throws JSONException{
+        JSONObject jo = new JSONObject();
+        for(String key : headers.keySet()){
+            jo.put(key, headers.get(key));
+        }
+        return jo.toString(indentSpaces);
     }
 
     public static class Builder{

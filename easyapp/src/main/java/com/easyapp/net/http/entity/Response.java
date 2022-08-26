@@ -47,6 +47,16 @@ public final class Response{
     public boolean containsBody(){
         return body != null;
     }
+    
+    public boolean isSuccessful(){
+        switch(status.getType()){
+            case SUCCESS:
+            case INFO:
+            return true;
+            default:
+            return false;
+        }
+    }
 
     public static class Builder{
         private Header header;

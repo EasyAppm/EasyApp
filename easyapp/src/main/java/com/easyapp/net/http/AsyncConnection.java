@@ -1,7 +1,6 @@
 package com.easyapp.net.http;
 
 import com.easyapp.core.TypeValidator;
-import com.easyapp.net.http.callback.CallbackStream;
 import com.easyapp.net.http.entity.Body;
 import com.easyapp.net.http.entity.Header;
 import com.easyapp.net.http.entity.Request;
@@ -31,21 +30,21 @@ public class AsyncConnection{
     private AsyncConnection(Request request){
         this.request = TypeValidator.argumentNonNull(request, "request cannot be null.");
     }
-    
+
     public static AsyncConnection open(Request request){
         return new AsyncConnection(request);
     }
 
-    public void then(final CallbackStream callback){
+    public void then(final Callback callback){
         new TaskConnection(callback).execute(request);
     }
 
     private class TaskConnection extends SimpleTask<Request, Response>{
 
-        protected final CallbackStream callback;
+        protected final Callback callback;
         private HttpURLConnection http;
 
-        protected TaskConnection(CallbackStream callback){
+        protected TaskConnection(Callback callback){
             this.callback = callback;
         }
 
@@ -129,7 +128,7 @@ public class AsyncConnection{
     }
 
     private static class Security{
-       static SSLSocketFactory getSocketFactory() throws Exception{
+        static SSLSocketFactory getSocketFactory() throws Exception{
             final TrustManager[] trustAllCerts = new TrustManager[]{
                 new X509TrustManager() {
                     @Override
@@ -146,7 +145,7 @@ public class AsyncConnection{
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
             return sslContext.getSocketFactory();
         }
-       static HostnameVerifier getHostnameVerifier(){
+        static HostnameVerifier getHostnameVerifier(){
             return new HostnameVerifier() {
                 @Override
                 public boolean verify(String hostname, SSLSession session){

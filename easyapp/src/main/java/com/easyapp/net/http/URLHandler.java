@@ -1,124 +1,151 @@
 package com.easyapp.net.http;
 
 import android.net.Uri;
+import com.easyapp.core.TypeValidator;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.LinkedHashMap;
 
-public abstract class URLHandler{
+public abstract class URLHandler {
 
-    private final Uri.Builder builder;
-    private final List<Query> queries = new ArrayList<>();
+    private final Map<String, String> queries = new LinkedHashMap<>();
+    private final List<String> paths = new ArrayList<>();
+    private final String url;
+    private final boolean keepPathSeparate;
 
-    protected URLHandler(String url){
-        if(url == null) throw new IllegalArgumentException("Url cannot be null");
+
+    protected URLHandler(String url) {
+        queries.clear();
+        paths.clear();
         Uri uri = Uri.parse(url);
+        for (String queryKey : uri.getQueryParameterNames()) {
+            putQuery(queryKey, uri.getQueryParameter(queryKey));
+        }
+        paths.addAll(uri.getPathSegments());
+        String encodePath = uri.getEncodedPath();
+        keepPathSeparate = encodePath.endsWith("/");
+        this.url = Uri.parse(TypeValidator.argumentNonNull(url, "url cannot be null.").replace(encodePath, "")).buildUpon().clearQuery().toString();
+    }
+
+
+    /**Query**/
+
+    public boolean containsQuery() {
+        return !queries.isEmpty();
+    }
+
+    public boolean containsKeyQuery(String key) {
+        return queries.containsKey(key);
+    }
+
+    public boolean containsValueQuery(String value) {
+        return queries.containsValue(value);
+    }
+
+    public int countQueries() {
+        return queries.size();
+    }
+
+    public Set<String> getKeysQuery() {
+        return queries.keySet();
+    }
+
+    public String getQuery(String key) {
+        return queries.get(key);
+    }
+
+    public boolean putQuery(String key, String value) {
+        if (key == null || value == null || key.isEmpty() || value.isEmpty()) {
+            return false;
+        }
+        queries.put(key, value);
+        return true;
+    }
+
+    public boolean putQuery(String keyAndValue) {
+        final String separate = ":";
+        if (!keyAndValue.contains(separate)) {
+            return false;
+        }
+        String[] array = keyAndValue.split(separate);
+        return putQuery(array[0].trim(), array[1].trim());
+    }
+
+    public String removeQuery(String key) {
+        return queries.remove(key);
+    }
+
+    public void clearQueries() {
         queries.clear();
-        for(String key : uri.getQueryParameterNames()){
-            if(key != null && !key.isEmpty())
-            queries.add(Query.create(key, uri.getQueryParameter(key)));
+    }
+
+    /**Path**/
+
+    public boolean containsPaths() {
+        return !paths.isEmpty();
+    }
+
+    public boolean containsPath(String path) {
+        return paths.contains(path);
+    }
+
+    public int countPaths() {
+        return paths.size();
+    }
+
+    public String getPath(int position) {
+        return paths.get(position);
+    }
+
+    public List<String> getPaths() {
+        return paths;
+    }
+
+    public void addPath(String path) {
+        if (path.contains("/")) {
+            for (String pathSepare : path.split("/")) addPath(pathSepare);
+        } else {
+            if (!path.trim().isEmpty()) paths.add(path.trim());
         }
-        this.builder = uri.buildUpon().clearQuery();
     }
 
-    public void putQuery(String key, String value){
-        final int index = getQueryIndex(key);
-        final Query query = Query.create(key, value);
-        if(isRangeIndex(index)) queries.set(index, query);
-        else queries.add(query);
+    public boolean removePath(String path) {
+        return paths.remove(path);
     }
 
-    public boolean removeQuery(String key){
-        final int index = getQueryIndex(key);
-        if(isRangeIndex(index)){
-            queries.remove(index); 
-            return true;
-        }
-        return false;
+    public String removePath(int position) {
+        return paths.remove(position);
     }
 
-    public String getQuery(String key){
-        final int index = getQueryIndex(key);
-        return isRangeIndex(index) ? queries.get(index).VALUE : null;
-    }
-
-    public List<Query> getQueries(){
-        return queries;
-    }
-
-    public boolean existQuery(String key){
-        return getQueryIndex(key) >= 0 ? true : false;
-    }
-
-    public int getQueryIndex(String key){
-        for(int index = 0; index < queries.size(); index++){
-            if(queries.get(index).KEY.equals(key))
-                return index;
-        }
-        return -1;
-    }
-
-    public void clearQuery(){
-        queries.clear();
-        builder.clearQuery();
+    public void clearPaths() {
+        paths.clear();
     }
 
     @Override
-    public String toString(){
-        saveAllQueries();
-        try{
+    public String toString() {
+        Uri.Builder builder = Uri.parse(url).buildUpon();
+        for (String path : paths) {
+            builder.appendPath(path);
+        }
+        
+        if(keepPathSeparate){
+            builder.appendPath("");
+        }
+        
+        for (String key : queries.keySet()) {
+            builder.appendQueryParameter(key, queries.get(key));
+        }
+        try {
             return URLDecoder.decode(builder.build().toString(), "UTF-8");
-        }catch(UnsupportedEncodingException e){
+        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    private boolean isRangeIndex(int number){
-        return number >= 0;
-    }
-
-    private void saveAllQueries(){
-        builder.clearQuery();
-        for(Query query : queries)
-            builder.appendQueryParameter(query.KEY, query.VALUE);
-    }
-
-    //**Query**//
-    public static class Query{
-        public final String KEY;
-        public final String VALUE;
-
-        public static final String SEPARATE_ENCODE = "=";
-        public static final String SEPARATE = ":";
-
-        private Query(String key, String value){
-            this.KEY = key;
-            this.VALUE = value;
-        }
-
-        public static Query create(String key, String value){
-            return new Query(key, value);
-        }
-
-        public String getEncode(){
-            return KEY + SEPARATE_ENCODE + VALUE;
-        }
-
-        public String toJson() throws JSONException{
-            return new JSONObject()
-                .put("key", KEY)
-                .put("value", VALUE)
-                .toString();
-        }
-
-        @Override
-        public String toString(){
-            return KEY + SEPARATE + VALUE;
-        }
-
-    }
 }
