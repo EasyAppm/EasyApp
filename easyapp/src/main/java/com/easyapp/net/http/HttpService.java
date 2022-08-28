@@ -1,6 +1,14 @@
 package com.easyapp.net.http;
-import com.easyapp.net.http.annotation.*;
-import com.easyapp.net.http.annotation.verbs.*;
+import com.easyapp.core.TypeInstance;
+import com.easyapp.core.TypeValidator;
+import com.easyapp.net.http.annotation.EncodeQuery;
+import com.easyapp.net.http.annotation.verbs.DELETE;
+import com.easyapp.net.http.annotation.verbs.GET;
+import com.easyapp.net.http.annotation.verbs.HEAD;
+import com.easyapp.net.http.annotation.verbs.OPTIONS;
+import com.easyapp.net.http.annotation.verbs.PATCH;
+import com.easyapp.net.http.annotation.verbs.POST;
+import com.easyapp.net.http.annotation.verbs.PUT;
 import com.easyapp.net.http.entity.Auth;
 import com.easyapp.net.http.entity.Body;
 import com.easyapp.net.http.entity.Header;
@@ -10,13 +18,13 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.easyapp.core.TypeInstance;
-import java.lang.reflect.Modifier;
+import com.easyapp.net.http.annotation.EncodeHeader;
 
 
 public class HttpService{
@@ -310,7 +318,8 @@ public class HttpService{
          **/
         private String getArgumentValueToString(int pos, Object[] args){
             if(args != null && (args.length > 0 && pos < args.length)){
-                for(Method method : args[pos].getClass().getDeclaredMethods()){
+                Object object = TypeValidator.argumentNonNull(args[pos], "Argument cannot be null.");
+                for(Method method : object.getClass().getDeclaredMethods()){
                     if(!Modifier.isPublic(method.getModifiers()) && method.getParameterCount() != 0) 
                         continue;
                     else if(method.getReturnType() == String.class && method.getName().equals("toString")){
