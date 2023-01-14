@@ -4,6 +4,7 @@ plugins {
 }
 
 android {
+    
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
 
@@ -13,32 +14,33 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-    
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
-    }
-}
-
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId = 'com.github.easyappm'
-                artifactId = 'Easyapp'
-                version = '1.0'
+        buildTypes {
+            release {
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             }
         }
-    }
+   
+       compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_7
+            targetCompatibility JavaVersion.VERSION_1_7
+        }
+        
 }
 
 dependencies {
    implementation 'com.github.ceas-dev:httpceas:1.0.1'
 }
+
+afterEvaluate {
+        publishing {
+            publications {
+                release(MavenPublication) {
+                    from components.release
+                    groupId = 'com.github.easyappm'
+                    artifactId = 'Easyapp'
+                    version = '1.0'
+                }
+            }
+        }
+    }
