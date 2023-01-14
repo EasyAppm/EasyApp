@@ -24,13 +24,7 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-    
-    
 }
-dependencies {
-            implementation 'com.github.ceas-dev:httpceas:1.0.1'
-	}
-
 
 afterEvaluate {
     publishing {
@@ -43,4 +37,8 @@ afterEvaluate {
             }
         }
     }
+}
+
+dependencies {
+   implementation 'com.github.ceas-dev:httpceas:1.0.1'
 }
