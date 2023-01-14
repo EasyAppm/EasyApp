@@ -44,13 +44,13 @@ public class MainActivity extends Activity implements OnUpdateTimeListener{
         int progress = 0;
         if(cursor != null){
             while(cursor.moveToNext()){
-                int index = cursor.getColumnIndex(MediaStore.Files.FileColumns._ID);
+                int index = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
                 int indexData = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
                 String title = cursor.getString(index);
                // setTitle(cursor.getType(indexData)+"");
                 HashMap<String, Object> map = new HashMap<>();
                
-                map.put("name", MediaStore.Files.getContentUri("external", cursor.getLong(index)) );
+                map.put("name", cursor.getString(index));
                 map.put("data", Uri.parse(cursor.getString(indexData)));
                 list.add(map);
             }

@@ -4,32 +4,33 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
-        minSdk 21
-        targetSdk 32
+        minSdkVersion 21
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
+    
+    
 }
-
 dependencies {
-    implementation 'com.github.ceas-dev:httpceas:1.0.0'
-}
+            implementation 'com.github.ceas-dev:httpceas:1.0.1'
+	}
+
 
 afterEvaluate {
     publishing {
@@ -38,7 +39,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.github.easyappm'
                 artifactId = 'Easyapp'
-                version = '1.0.4'
+                version = '1.0'
             }
         }
     }
