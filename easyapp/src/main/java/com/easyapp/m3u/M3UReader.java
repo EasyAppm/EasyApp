@@ -1,13 +1,14 @@
 package com.easyapp.m3u;
 import com.easyapp.core.TypeValidator;
-import com.easyapp.net.http.Client;
-import com.easyapp.net.http.entity.Response;
 import com.easyapp.task.SimpleTask;
+import com.http.ceas.entity.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.List;
+import com.http.ceas.core.HttpClient;
+import com.http.ceas.callback.HttpCallback;
 
 public class M3UReader{
 
@@ -32,7 +33,28 @@ public class M3UReader{
     }
 
     public void startRead(String url){
-        Client.with(url)
+        HttpClient.with(url).get()
+            .then(new HttpCallback(){
+
+                @Override
+                public Runnable onResponse(Response response) throws Exception{
+                    if(response.isSuccessful())
+                        new ReaderStream(response).execute(response.body().toStream());
+                    else{
+                        onFailure(new UnsupportedOperationException(
+                                "unable to continue reading, request response: " 
+                                + response.status().message())
+                        );
+                    }
+                    return null;
+                }
+
+                @Override
+                public void onFailure(Exception p1){
+                    callback.onReadFailure(p1);
+                }
+        });
+        /*Client.with(url)
             .get()
             .then(new com.easyapp.net.http.Callback(){
                 @Override
@@ -50,7 +72,7 @@ public class M3UReader{
                 public void onFailure(Throwable throwable){
                     callback.onReadFailure(throwable);
                 }
-            });
+            });*/
     }
 
     private class ReaderStream extends SimpleTask<InputStream, List<M3U>>{
@@ -84,8 +106,5 @@ public class M3UReader{
         }
 
     }
-
-
-
 
 }

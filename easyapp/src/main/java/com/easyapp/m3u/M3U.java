@@ -31,7 +31,7 @@ public class M3U{
     public String getTag(String key){
         return getTags().get(key);
     }
-    
+
     public Set<String> getKeysTag(){
         return tags.keySet();
     }
@@ -45,5 +45,26 @@ public class M3U{
         }
         return jo.toString();
     }
+
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder(M3UParse.TAG_INFO)
+        .append("-1");
+        for(String key : tags.keySet()){
+            if(key.equals("tvg-name")) continue;
+            sb.append(" ")
+                .append(key)
+                .append("=")
+                .append("\"")
+                .append(tags.get(key))
+                .append("\"");
+        }
+        sb.append("," + description)
+            .append("\n")
+            .append(url);
+            return sb.toString();
+    }
+
+
 
 }

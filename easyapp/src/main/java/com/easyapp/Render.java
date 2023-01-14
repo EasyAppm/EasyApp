@@ -6,12 +6,13 @@ import android.util.LruCache;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import com.easyapp.core.TypeValidator;
-import com.easyapp.net.http.Client;
-import com.easyapp.net.http.entity.Response;
-import com.easyapp.net.http.entity.Status;
 import com.easyapp.task.SimpleTask;
 import com.easyapp.util.BitmapUtils;
 import com.easyapp.util.StreamUtils;
+import com.http.ceas.callback.HttpCallback;
+import com.http.ceas.core.HttpClient;
+import com.http.ceas.core.HttpStatus;
+import com.http.ceas.entity.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -115,18 +116,19 @@ public class Render{
             new TaskLoad(this).executeCache(bitmapCache);
         }else{
             target.setImageResource(resLoading);
-            Client.with(url)
-                .get()
-                .then(new com.easyapp.net.http.Callback(){
+            HttpClient.with(url).get()
+                .then(new HttpCallback(){
                     @Override
-                    public void onResponse(Response response){
-                        if(isTargetTagEquals(response.getRequest().getUrl())){
+                    public Runnable onResponse(Response response) throws Exception{
+                        if(isTargetTagEquals(response.request().url())){
                             new TaskLoad(Render.this, response).execute();
                         }
+                        return null;
                     }
+
                     @Override
-                    public void onFailure(Throwable throwable){
-                        new TaskLoad(Render.this).executeFailure(throwable);
+                    public void onFailure(Exception e){
+                        new TaskLoad(Render.this).executeFailure(e);
                     }
                 });
         }
@@ -227,7 +229,7 @@ public class Render{
 
         @Override
         protected Bitmap doTaskInBackground(Void[] params) throws Throwable{
-            String tag = withResponse() ? response.getRequest().getUrl() : withFile() ? file.getAbsolutePath() : null;
+            String tag = withResponse() ? response.request().url() : withFile() ? file.getAbsolutePath() : null;
             if(tag != null && !render.isTargetTagEquals(tag)){
                 Animation anim = render.target.getAnimation();
                 if(anim != null) anim.cancel();
@@ -240,12 +242,12 @@ public class Render{
                 is = new FileInputStream(file);
                 signature = (signature == null) ? file.getAbsolutePath() : signature;
             }else if(withResponse()){
-                if(!render.ignoreStatus && response.getStatus().getType() != Status.Type.SUCCESS){
+                if(!render.ignoreStatus && !response.status().isSuccess()){
                     statusErro = true;
                     throw new Exception("The URL did not return a success status.");
                 }
-                is = response.getBody().stream();
-                signature = (signature == null) ? response.getRequest().getUrl() : signature;
+                is = response.body().toStream();
+                signature = (signature == null) ? response.request().url() : signature;
             }
 
             if((Math.max(render.width, render.height) <= 0)){
@@ -288,11 +290,11 @@ public class Render{
             render.target.setImageResource(render.resFailure);
             if(render.callback != null){
                 if(statusErro){
-                    Status status = response.getStatus();
+                    HttpStatus status = response.status();
                     render.callback.onFailure(
                         throwable,
-                        status.getCode(),
-                        status.getMessage()
+                        status.code(),
+                        status.message()
                     );
                 }else{
                     render.callback.onFailure(throwable, -1, "");

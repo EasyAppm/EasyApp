@@ -4,6 +4,21 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
 	android:orientation="vertical">
+        
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+	<TextView
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Medium Text"
+		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:onClick="click"
+		android:id="@+id/activitymainTextView1"/>
+    
+    </ScrollView>
 
 	<ImageView
 		android:src="@android:drawable/ic_delete"

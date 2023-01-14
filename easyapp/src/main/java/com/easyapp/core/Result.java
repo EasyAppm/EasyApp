@@ -41,4 +41,7 @@ public class Result<T, E extends Throwable>{
         return error.getMessage();
     }
 
+    
+    
+
 }

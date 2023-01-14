@@ -2,100 +2,152 @@ package com.easyapp.demo;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.widget.Toast;
-import com.easyapp.demo.MainActivity;
-import com.easyapp.zip.Zip;
-import java.io.File;
-import com.easyapp.util.FileUtils;
-import com.easyapp.cipher.FileCipher;
-import java.security.InvalidAlgorithmParameterException;
-import javax.crypto.NoSuchPaddingException;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.InvalidKeyException;
-import com.easyapp.lab.FileSecurity;
-import com.easyapp.util.StreamUtils;
-import java.io.FileInputStream;
-import android.graphics.ImageDecoder;
+import android.view.View;
 import android.widget.ImageView;
-import com.easyapp.Render;
-import android.view.animation.AnimationUtils;
-import android.widget.ListView;
-import java.util.ArrayList;
+import android.widget.TextView;
+import com.easyapp.timer.OnUpdateTimeListener;
+import java.io.Serializable;
+import com.easyapp.demo.database.ObjectDataBase;
+import com.easyapp.demo.database.MediaTeste;
+import android.database.Cursor;
+import android.provider.MediaStore;
+import android.widget.Toast;
+import java.util.Arrays;
+import com.easyapp.demo.database.Path;
 import java.util.List;
+import com.easyapp.demo.utils.StorageProvider;
+import com.easyapp.task.SimpleTask;
+import com.easyapp.task.Task;
+import android.widget.ListView;
 import java.util.HashMap;
-import java.io.FileNotFoundException;
-import android.graphics.Bitmap;
+import java.util.ArrayList;
+import android.content.ContentUris;
+import android.net.Uri;
 
-public class MainActivity extends Activity{ 
+public class MainActivity extends Activity implements OnUpdateTimeListener{
 
+    TextView text;
     ImageView image;
+    ListView listView;
+    ListAdapater adapater;
+    StorageProvider provider;
 
-    File file1 = new File("storage/emulated/0/Pictures/City blue.jpg");
 
     @Override
     public void onBackPressed(){
-        //super.onBackPressed();
-        Render.into(image)
-            .cache(Render.Cache.MAX_8MB)
-            .load("https://images.dog.ceo/breeds/schnauzer-miniature/n02097047_4274.jpg", 
-            new Render.Callback(){
-
-                @Override
-                public void onSuccess(Bitmap bitmap){
-                    
-                   setTitle(FileUtils.formatSize(bitmap.getByteCount()));
-                    
-                }
-
-                @Override
-                public void onFailure(Throwable throwable, int statusCode, String statusMessage){
-                    toast(throwable.toString());
-                    toast(statusCode + " - " + statusMessage);
-                }
-            });
-
+       // MediaStore.Images.Media.getContentUri("hshs", 0);
+        text.setText(MediaStore.Files.getContentUri("external").toString());
+       
+        List<HashMap<String, Object>> list = new ArrayList<>();
+        Cursor cursor = provider.getAllImages();
+        int max = cursor.getCount();
+        int progress = 0;
+        if(cursor != null){
+            while(cursor.moveToNext()){
+                int index = cursor.getColumnIndex(MediaStore.Files.FileColumns._ID);
+                int indexData = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
+                String title = cursor.getString(index);
+               // setTitle(cursor.getType(indexData)+"");
+                HashMap<String, Object> map = new HashMap<>();
+               
+                map.put("name", MediaStore.Files.getContentUri("external", cursor.getLong(index)) );
+                map.put("data", Uri.parse(cursor.getString(indexData)));
+                list.add(map);
+            }
+        }
+        adapater.update(list);
 
     }
 
+    @Override
+    public void onUpdateTime(long miliseconds){
 
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        text = findViewById(R.id.activitymainTextView1);
         image = findViewById(R.id.activitymainImageView1);
-        ListView listview = findViewById(R.id.activitymainListView1);
+        listView = findViewById(R.id.activitymainListView1);
+        provider = StorageProvider.getInstance(this);
+        adapater = new ListAdapater(this);
+        listView.setAdapter(adapater);
 
+    } 
+
+
+    public void click(View View){
+
+    }
+
+    private class TaskCursor extends Task<Cursor, Integer, String>{
         
-        File file = new File("/storage/emulated/0/WhatsApp/Media/WhatsApp Images");
+        
 
-        /*ListAdapater adataper = new ListAdapater(this);
-        listview.setAdapter(adataper);
-        List<HashMap<String, Object>> list = new ArrayList<>();
-        try{
-            for(File fileIn : FileUtils.list(file)){
-                HashMap<String, Object> hash = new HashMap<>();
-                hash.put("key", fileIn);
-                list.add(hash);
-
+        @Override
+        protected String doTaskInBackground(Cursor[] params) throws Throwable{
+            StringBuilder sb = new StringBuilder();
+            Cursor cursor = params [0];
+            int max = cursor.getCount();
+            int progress = 0;
+            if(cursor != null){
+                while(cursor.moveToNext()){
+                    int index = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
+                    String title = cursor.getString(index);
+                    sb.append(title).append("\n");
+                    postProgressTask(progress++, max);
+                }
             }
-        }catch(FileNotFoundException e){
-            toast(e.toString());
+            return sb.toString();
         }
-        toast(list.size() + "");
-        adataper.update(list);*/
+
+        @Override
+        protected void onResultTask(String result){
+            text.setText(result);
+        }
+
+        @Override
+        protected void onPostProgressTask(Integer[] post){
+            MainActivity.this.setTitle(post[0] + " _ " + post[1]);
+        }
+        
+        
+
+        @Override
+        protected void onFailureTask(Throwable throwable){
+            text.setText(throwable.toString());
+        }
+
 
     }
 
 
+    private static class Teste implements Serializable{
 
-    private void toast(boolean b){
-        toast(String.valueOf(b));
+        static final long serialVersionUID = 999;
+
+        String name;
+        int age;
+
+        public Teste(String name, int age){
+            this.name = name;
+            this.age = age;
+        }
+
+        @Override
+        public String toString(){
+            return name + "_" + age;
+        }
+
+        public void teste(){
+
+        }
+
+
     }
 
-    private void toast(String message){
-        Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
-    }
+
 
 }

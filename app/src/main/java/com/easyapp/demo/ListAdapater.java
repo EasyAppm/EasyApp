@@ -50,32 +50,8 @@ public class ListAdapater extends BaseAdapter{
         view = LayoutInflater.from(context).inflate(R.layout.raw, null, true);
         final TextView text = view.findViewById(R.id.rawTextView1);
         final ImageView image = view.findViewById(R.id.rawImageView1);
-        
-        final Object object = getItem(pos).get("key");
-        
-        if(object instanceof File){
-            
-            image.post(new Runnable(){
-
-                    @Override
-                    public void run(){
-                        File file = (File)object;
-                        text.setText(file.getName());
-                        Render.into(image)
-                            .loading(R.drawable.ic_launcher)
-                            .resize(image.getWidth(), image.getHeight())
-                            .animation(AnimationUtils.loadAnimation(context, android.R.anim.slide_in_left))
-                            .load(file);
-                    }
-
-                
-            });
-            
-            
-        }else{
-            
-            
-        }
+        text.setText(list.get(pos).get("name").toString());
+        Render.into(image).load(new File(text.getText().toString()));
         }catch(Throwable t){
             Toast.makeText(view.getContext(), t.toString(), 0).show();
         }
