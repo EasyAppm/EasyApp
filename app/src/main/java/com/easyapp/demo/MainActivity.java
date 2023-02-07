@@ -23,6 +23,14 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import android.content.ContentUris;
 import android.net.Uri;
+import com.http.ceas.core.HttpClient;
+import com.http.ceas.callback.HttpCallback;
+import com.http.ceas.entity.Response;
+import com.http.ceas.callback.RestCallback;
+import com.http.ceas.core.HttpHeaders;
+import com.http.ceas.core.HttpStatus;
+import com.http.ceas.callback.GsonCallback;
+import com.google.gson.reflect.TypeToken;
 
 public class MainActivity extends Activity implements OnUpdateTimeListener{
 
@@ -35,9 +43,9 @@ public class MainActivity extends Activity implements OnUpdateTimeListener{
 
     @Override
     public void onBackPressed(){
-       // MediaStore.Images.Media.getContentUri("hshs", 0);
+        // MediaStore.Images.Media.getContentUri("hshs", 0);
         text.setText(MediaStore.Files.getContentUri("external").toString());
-       
+
         List<HashMap<String, Object>> list = new ArrayList<>();
         Cursor cursor = provider.getAllImages();
         int max = cursor.getCount();
@@ -47,9 +55,9 @@ public class MainActivity extends Activity implements OnUpdateTimeListener{
                 int index = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
                 int indexData = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
                 String title = cursor.getString(index);
-               // setTitle(cursor.getType(indexData)+"");
+                // setTitle(cursor.getType(indexData)+"");
                 HashMap<String, Object> map = new HashMap<>();
-               
+
                 map.put("name", cursor.getString(index));
                 map.put("data", Uri.parse(cursor.getString(indexData)));
                 list.add(map);
@@ -80,11 +88,47 @@ public class MainActivity extends Activity implements OnUpdateTimeListener{
 
     public void click(View View){
 
+        TypeToken<List<Pessoa>> type = new TypeToken<List<Pessoa>>(){};
+
+        try{
+            Pessoa pessoa = HttpClient.with("").get()
+            .execute().body().toType(Pessoa.class);
+        }catch(Exception e){}
+
+        
+        HttpClient.with("")
+        .delete()
+            .then(new HttpCallback(){
+
+                @Override
+                public Runnable onResponse(Response response) throws Exception{
+                    //Leitura do body
+                    final Pessoa pessoa = response.body().toType(Pessoa.class);
+                    //Abriu uma thread na ui
+                    return new Runnable(){
+
+                        @Override
+                        public void run(){
+                            text.setText(pessoa.toString());
+                        }
+
+                        
+                    };
+                }
+
+                @Override
+                public void onFailure(Exception p1){
+                }
+
+                
+            });
+
+
     }
 
     private class TaskCursor extends Task<Cursor, Integer, String>{
-        
-        
+
+
 
         @Override
         protected String doTaskInBackground(Cursor[] params) throws Throwable{
@@ -110,10 +154,10 @@ public class MainActivity extends Activity implements OnUpdateTimeListener{
 
         @Override
         protected void onPostProgressTask(Integer[] post){
-            MainActivity.this.setTitle(post[0] + " _ " + post[1]);
+            MainActivity.this.setTitle(post [0] + " _ " + post [1]);
         }
-        
-        
+
+
 
         @Override
         protected void onFailureTask(Throwable throwable){

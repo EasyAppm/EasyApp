@@ -29,7 +29,7 @@ android {
 }
 
 dependencies {
-   implementation 'com.github.ceas-dev:httpceas:1.0.1'
+   api 'com.github.ceas-dev:httpceas:1.0.1'
 }
 
 afterEvaluate {
