@@ -43,7 +43,6 @@ public class MainActivity extends Activity implements OnUpdateTimeListener{
 
     @Override
     public void onBackPressed(){
-        Storage
         // MediaStore.Images.Media.getContentUri("hshs", 0);
         text.setText(MediaStore.Files.getContentUri("external").toString());
 

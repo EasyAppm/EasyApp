@@ -24,8 +24,7 @@ public class StorageProvider{
     //Listar arquivos
     public List<Archive> listDownload(){
         Cursor cursor = query(MediaStore.Downloads.getContentUri(volume.toLowerCase()));
-        
-
+        return null;
     }
 
     private Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder){
