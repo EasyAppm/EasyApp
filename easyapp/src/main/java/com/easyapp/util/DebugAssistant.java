@@ -18,66 +18,68 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class DebugAssistant{
+public final class DebugAssistant {
 
     private final static String EXTENSION = ".log";
 
-    public static Log lastLog(Context context){
-        try{
+    public static Log lastLog(Context context) {
+        try {
             return lastLogOrThrows(context);
-        }catch(Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public static List<Log> logs(Context context){
-        try{
+    public static List<Log> logs(Context context) {
+        try {
             return logsOrThrows(context);
-        }catch(Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public static boolean deleteLogs(Context context){
-        return getFile(context, getDefaultFolder(context)).delete();
+    public static boolean deleteLogs(Context context) {
+        return FileUtils.delete(
+            getFile(context, getDefaultFolder(context))
+        );
     }
 
-    public static List<Log> filter(Context context, Class<? extends Throwable>... types){
-        try{
+    public static List<Log> filter(Context context, Class<? extends Throwable>... types) {
+        try {
             return filterOrThrows(context, types);
-        }catch(Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
 
-    public static Log lastLogOrThrows(Context context) throws Exception{
+    public static Log lastLogOrThrows(Context context) throws Exception {
         List<Log> list = logsOrThrows(context);
         Collections.sort(list);
         return list.isEmpty() ? null : list.get(list.size() - 1);
     }
 
-    public static List<Log> logsOrThrows(Context context) throws Exception{
+    public static List<Log> logsOrThrows(Context context) throws Exception {
         return filesToListLog(getFileList(context, getDefaultFolder(context), FileUtils.FILTER_FILES));
     }
 
-    public static List<Log> filterOrThrows(Context context, final Class<? extends Throwable>... types) throws Exception{
+    public static List<Log> filterOrThrows(Context context, final Class<? extends Throwable>... types) throws Exception {
         return filesToListLog(getFileList(context, getDefaultFolder(context), new FileFilter(){
-                    @Override
-                    public boolean accept(File file){
-                        try{
-                            Log log = deserialize(file);
-                            for(Class<? extends Throwable> type : types){
-                                if(log.getTitle().equals(type.getSimpleName())) return true;
-                            }
-                        }catch(Exception ignore){}finally{
-                            return false;
-                        }
-                    }
-                }
-            ));
+                                      @Override
+                                      public boolean accept(File file) {
+                                          try {
+                                              Log log = deserialize(file);
+                                              for (Class<? extends Throwable> type : types) {
+                                                  if (log.getTitle().equals(type.getSimpleName())) return true;
+                                              }
+                                          } catch (Exception ignore) {} finally {
+                                              return false;
+                                          }
+                                      }
+                                  }
+                              ));
     }
 
-    public final static class Log implements Serializable, Comparable<Log>{
+    public final static class Log implements Serializable, Comparable<Log> {
 
         private static final long serialVersionUID = 1L;
 
@@ -89,7 +91,7 @@ public final class DebugAssistant{
         private final File file;
         private final Throwable throwable;
 
-        public Log(Throwable th, String header, File file){
+        public Log(Throwable th, String header, File file) {
             this.header = header;
             this.title = th.getClass().getSimpleName();
             this.message = th.getMessage();
@@ -99,48 +101,48 @@ public final class DebugAssistant{
             this.throwable = th;
         }
 
-        public String getHeader(){
+        public String getHeader() {
             return header;
         }
 
-        public String getTitle(){
+        public String getTitle() {
             return title;
         }
 
-        public String getMessage(){
+        public String getMessage() {
             return message;
         }
 
-        public String getCause(){
+        public String getCause() {
             return cause;
         }
 
-        public long getTimeStamp(){
+        public long getTimeStamp() {
             return timeStamp;
         }
 
-        public long getSize(){
+        public long getSize() {
             return file.length();
         }
 
-        public String getName(){
+        public String getName() {
             return file.getName();
         }
 
-        public Throwable getThrowable(){
+        public Throwable getThrowable() {
             return throwable;
         }
 
         @Override
-        public String toString(){
+        public String toString() {
             return "Title:" + title + "\n" +
                 "Message:" + message + "\n\n" +
                 "Cause:" + cause;
         }
 
         @Override
-        public boolean equals(Object object){
-            if(object instanceof Log){
+        public boolean equals(Object object) {
+            if (object instanceof Log) {
                 Log log = (Log)object;
                 return log.getThrowable().equals(throwable);
             }
@@ -148,15 +150,15 @@ public final class DebugAssistant{
         }
 
         @Override
-        public int compareTo(Log log){
+        public int compareTo(Log log) {
             return (int)(getTimeStamp() - log.getTimeStamp());
         }
 
 
-        private static String getCause(Throwable throwable){
+        private static String getCause(Throwable throwable) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
-            for(Throwable th = throwable; th != null; th = th.getCause()){
+            for (Throwable th = throwable; th != null; th = th.getCause()) {
                 th.printStackTrace(pw);
             }
             String allCauses = sw.toString();
@@ -167,29 +169,29 @@ public final class DebugAssistant{
     }
 
 
-    public static abstract class LogApplication extends Application{
+    public static abstract class LogApplication extends Application {
 
         private Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
 
         @Override
-        public final void onCreate(){
+        public final void onCreate() {
             this.uncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
             Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                     @Override
-                    public void uncaughtException(final Thread thread, final Throwable ex){
-                        try{
+                    public void uncaughtException(final Thread thread, final Throwable ex) {
+                        try {
                             final File file = new File(
                                 getFile(LogApplication.this, defaultFolder()),
                                 resolveFileName(ex)
                             );
-                            if(FileUtils.notExists(file)){
+                            if (FileUtils.notExists(file)) {
                                 FileUtils.createFile(file);
                             }
                             serialize(new Log(ex, defaultHeader(), file), file);
 
-                        }catch(Exception e){
+                        } catch (Exception e) {
                             uncaughtExceptionHandler.uncaughtException(thread, e);
-                        }finally{
+                        } finally {
                             uncaughtExceptionHandler.uncaughtException(thread, ex);
                         }
                     }
@@ -199,23 +201,23 @@ public final class DebugAssistant{
             onCreateApplication();
         }
 
-        public void onCreateApplication(){}
+        public void onCreateApplication() {}
 
         protected abstract String defaultFolder();
 
-        protected String defaultHeader(){
+        protected String defaultHeader() {
             return null;
         }
 
         protected abstract Name defaultName();
 
-        public static enum Name{
+        public static enum Name {
             TIMESTAMP, CLASS
             }
 
 
-        private String resolveFileName(Throwable th){
-            if(defaultName() == Name.CLASS){
+        private String resolveFileName(Throwable th) {
+            if (defaultName() == Name.CLASS) {
                 return th.getClass().getSimpleName() + EXTENSION;
             }
             return System.currentTimeMillis() + EXTENSION;
@@ -223,22 +225,22 @@ public final class DebugAssistant{
 
     }
 
-    private static File getFile(Context context, String defaultFolder){
+    private static File getFile(Context context, String defaultFolder) {
         return new File(context.getFilesDir().getParent(), defaultFolder);
     }
 
-    private static File[] getFileList(Context context, String defaultFolder, FileFilter filter){
-        if(filter == null){
+    private static File[] getFileList(Context context, String defaultFolder, FileFilter filter) {
+        if (filter == null) {
             return getFile(context, defaultFolder).listFiles();
         }
         return getFile(context, defaultFolder).listFiles(filter);
     }
 
-    private static List<Log> filesToListLog(File[] files) throws Exception{
+    private static List<Log> filesToListLog(File[] files) throws Exception {
         List<Log> list = new ArrayList<>();
-        if(files != null){
-            for(File file : files){
-                if(file.getName().endsWith(EXTENSION)){
+        if (files != null) {
+            for (File file : files) {
+                if (file.getName().endsWith(EXTENSION)) {
                     list.add(deserialize(file));
                 }
             }
@@ -246,7 +248,7 @@ public final class DebugAssistant{
         return list;
     }
 
-    private static String getDefaultFolder(Context context){
+    private static String getDefaultFolder(Context context) {
         TypeValidator.argumentNonNull(context, "The context cannot be null");
         context = context.getApplicationContext();
         TypeValidator.argumentCondition(
@@ -257,7 +259,7 @@ public final class DebugAssistant{
     }
 
 
-    private static void serialize(Log log, File file) throws Exception{
+    private static void serialize(Log log, File file) throws Exception {
         final ObjectOutputStream oos = new ObjectOutputStream(
             new FileOutputStream(file)
         );
@@ -266,7 +268,7 @@ public final class DebugAssistant{
         StreamUtils.close(oos);
     }
 
-    private static Log deserialize(File file) throws Exception{
+    private static Log deserialize(File file) throws Exception {
         final ObjectInputStream ois = new ObjectInputStream(
             new FileInputStream(file)
         );
