@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/EasyAppDemo.iml" filepath="$PROJECT_DIR$/.idea/modules/EasyAppDemo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyAppDemo.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyAppDemo.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyAppDemo.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyAppDemo.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyAppDemo.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyAppDemo.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/EasyAppDemo.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/EasyAppDemo.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/easyapp/EasyAppDemo.easyapp.iml" filepath="$PROJECT_DIR$/.idea/modules/easyapp/EasyAppDemo.easyapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/easyapp/EasyAppDemo.easyapp.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/easyapp/EasyAppDemo.easyapp.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/easyapp/EasyAppDemo.easyapp.main.iml" filepath="$PROJECT_DIR$/.idea/modules/easyapp/EasyAppDemo.easyapp.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/easyapp/EasyAppDemo.easyapp.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/easyapp/EasyAppDemo.easyapp.unitTest.iml" />
+    </modules>
+  </component>
+</project>
