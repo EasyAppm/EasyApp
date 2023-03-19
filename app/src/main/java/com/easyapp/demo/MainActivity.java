@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import com.easyapp.util.SignatureUtils;
 
 public class MainActivity extends Activity implements OnUpdateTimeListener{
 
@@ -36,6 +37,7 @@ public class MainActivity extends Activity implements OnUpdateTimeListener{
         int max = cursor.getCount();
         int progress = 0;
         if(cursor != null){
+            SignatureUtils.fromPath(this, getPackageCodePath(), "SHA-256").getDataInHex();
             while(cursor.moveToNext()){
                 int index = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
                 int indexData = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);

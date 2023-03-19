@@ -21,6 +21,11 @@ public class Result<T, E extends Throwable>{
         this.error = null;
     }
 
+    @Override
+    public String toString() {
+        return isSuccess() ? data.toString() : error.toString();
+    }
+
     public final boolean isSuccess(){
         return error == null;
     }
@@ -31,6 +36,13 @@ public class Result<T, E extends Throwable>{
 
     public final T getData(){
         return data;
+    }
+    
+    public final T getDataOrThrows() throws E{
+        if(isSuccess()){
+            return data;
+        }
+        throw error;
     }
 
     public final E getError(){
